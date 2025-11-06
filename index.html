@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Merge Tool (Prototype)</title>
-    <link rel="stylesheet" href="style.css">
-</head>
 <body>
 
     <h1>Data Merge Prototype</h1>
@@ -14,16 +6,21 @@
     <fieldset>
         <legend>File A (The "Main" File)</legend>
         <input type="file" id="fileA" accept=".csv">
+        <label for="keyA">Match on column:</label>
+        <select id="keyA"></select>
     </fieldset>
 
     <fieldset>
         <legend>File B (The "Lookup" File)</legend>
         <input type="file" id="fileB" accept=".csv">
+        <label for="keyB">Match on column:</label>
+        <select id="keyB"></select>
     </fieldset>
+
+    <button id="runButton" disabled>Load both files to run</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
     <script src="app.js" defer></script>
 
 </body>
-</html>
