@@ -1,0 +1,16 @@
+{
+    "short_name": "DataMerge",
+    "name": "Data Merge Tool",
+    "description": "A fast, client-side tool to compare and merge CSV files.",
+    "start_url": "/app",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3498db",
+    "icons": [
+        {
+            "src": "/icon-512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ]
+}

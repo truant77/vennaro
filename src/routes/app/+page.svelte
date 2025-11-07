@@ -3,6 +3,7 @@
     // STEP 1: SCRIPT (JavaScript)
     // ---------------------------------
     import Papa from 'papaparse';
+    import PayfastButton from '$lib/components/PayfastButton.svelte';
 
     // --- Svelte State Variables ---
     // In Svelte, we just declare variables. When they change,
@@ -318,13 +319,9 @@ console.log("Mismatches B:", mismatchesB);
                     please upgrade to <strong>Pro</strong>.
                 </p>
 
-                <a 
-                    href="https://www.payfast.co.za" 
-                    target="_blank" 
-                    class="payfast-button"
-                >
-                    Upgrade to Pro (R...ZAR)
-                </a>
+                <PayfastButton class="payfast-button">
+                    Upgrade to Pro (R79.99/mo)
+                </PayfastButton>
 
                 <button class="modal-close" on:click={() => showUpgradeModal = false}>
                     &times;
