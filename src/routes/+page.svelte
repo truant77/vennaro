@@ -32,6 +32,10 @@
     // whenever dataA or dataB changes. We use it to enable/disable the button.
     $: isReady = dataA && dataB;
 
+    // --- Paywall State ---
+    let showUpgradeModal = false;
+    const FREE_TIER_LIMIT = 5; // Set to 5 for easy testing. We'll change this to 1000 later.
+
     /**
      * Handles file parsing for either File A or File B.
      * This one function replaces both of our old 'addEventListener' calls.
@@ -70,12 +74,24 @@
         });
     }
 
+
+
     /**
      * This is our main "VLOOKUP" function from Week 1.
      * It's almost identical.
      */
     function runComparison() {
-        console.log("--- Running Comparison ---");
+
+        // --- PAYWALL CHECK ---
+        // Check if either file exceeds the free tier limit
+        if (dataA.length > FREE_TIER_LIMIT || dataB.length > FREE_TIER_LIMIT) {
+            console.warn(`Paywall triggered. File A: ${dataA.length} rows, File B: ${dataB.length} rows.`);
+            showUpgradeModal = true; // Show the modal
+            return; // Stop the function from running
+        }
+        // --- END PAYWALL CHECK ---
+
+        console.log("--- Running Comparison ---"); // This line should NOT be reached
 
         if (!selectedKeyA || !selectedKeyB) {
             console.error("Please select match keys for both files.");
@@ -289,7 +305,33 @@ console.log("Mismatches B:", mismatchesB);
                 </table>
             </div>
         </section>
-    {/if}   
+    {/if}
+    {#if showUpgradeModal}
+        <div class="modal-backdrop" on:click={() => showUpgradeModal = false}>
+            <div class="modal" on:click|stopPropagation>
+                <h2>Free Limit Reached</h2>
+                <p>
+                    Your file has more than {FREE_TIER_LIMIT} rows.
+                </p>
+                <p>
+                    To process unlimited rows, support for XLSX files, and save mapping templates,
+                    please upgrade to <strong>Pro</strong>.
+                </p>
+
+                <a 
+                    href="https://www.payfast.co.za" 
+                    target="_blank" 
+                    class="payfast-button"
+                >
+                    Upgrade to Pro (R...ZAR)
+                </a>
+
+                <button class="modal-close" on:click={() => showUpgradeModal = false}>
+                    &times;
+                </button>
+            </div>
+        </div>
+    {/if}
 </main>
 
 <style>
@@ -460,5 +502,60 @@ console.log("Mismatches B:", mismatchesB);
 
     .data-table tr:hover {
         background-color: #f9f9f9;
+    }
+    /* --- Modal Styles --- */
+    .modal-backdrop {
+        position: fixed; /* Sits on top of everything */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 8px;
+        padding: 2rem;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        position: relative; /* For the close button */
+    }
+
+    .modal h2 {
+        margin-top: 0;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.75rem;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #aaa;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .payfast-button {
+        display: inline-block;
+        background-color: #22a04a; /* Payfast-ish Green */
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        margin-top: 1rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .payfast-button:hover {
+        background-color: #1b803a;
     }
 </style>
