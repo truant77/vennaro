@@ -21,4 +21,18 @@
         margin: 0;
         padding: 0;
     }
+    button {
+        font-size: 1rem; /* Adjust as needed */
+        font-weight: 600;
+        padding: 0.75rem 1.5rem; /* Standard button padding */
+        border: none;
+        border-radius: 6px;
+        background-color: #3498db; /* Blue background */
+        color: white; /* White text */
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    button:hover {
+        background-color: #2980b9; /* Darker blue on hover */
+    }
 </style>

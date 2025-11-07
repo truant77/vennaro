@@ -2,7 +2,7 @@
     // ---------------------------------
     // STEP 1: SCRIPT (JavaScript)
     // ---------------------------------
-    import Papa from 'papaparse';
+    import * as Papa from 'papaparse';
     import PayfastButton from '$lib/components/PayfastButton.svelte';
     import logo from '$lib/assets/icon-512.png';
 
@@ -75,7 +75,47 @@
             error: (error) => console.error(`Error parsing File ${fileType}:`, error.message)
         });
     }
+/**
+ * Handles downloading the currently active result set as a CSV file.
+ */
+ function downloadResults() {
+    let dataToExport = [];
+    let filename = 'results.csv';
 
+    // 1. Get the data from the currently active tab
+    if (activeTab === 'matches') {
+        dataToExport = matches;
+        filename = 'matches.csv';
+    } else if (activeTab === 'mismatchesA') {
+        dataToExport = mismatchesA;
+        filename = 'mismatches_file_A.csv';
+    } else if (activeTab === 'mismatchesB') {
+        dataToExport = mismatchesB;
+        filename = 'mismatches_file_B.csv';
+    }
+
+    if (dataToExport.length === 0) {
+        alert("There's no data in this view to download.");
+        return;
+    }
+
+    // 2. Convert the array of objects back into a CSV string
+    // Papa.unparse is the reverse of Papa.parse
+    const csvString = Papa.unparse(dataToExport);
+
+    // 3. Create a "virtual" link to trigger the download
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 
 
     /**
@@ -160,16 +200,20 @@
         resultsHeaders = Object.keys(mismatchesA[0]);
     } else if (mismatchesB.length > 0) {
         resultsHeaders = Object.keys(mismatchesB[0]);
-}
-
-hasResults = true; // Show the results section
-activeTab = 'matches'; // Default to the 'matches' tab
-
-console.log("--- Comparison Complete. Results are now in state. ---");
-console.log("Matches:", matches);
-console.log("Mismatches A:", mismatchesA);
-console.log("Mismatches B:", mismatchesB);
     }
+        hasResults = true; // Show the results section
+        activeTab = 'matches'; // Default to the 'matches' tab
+
+        console.log("--- Comparison Complete. Results are now in state. ---");
+        console.log("Matches:", matches);
+        console.log("Mismatches A:", mismatchesA);
+        console.log("Mismatches B:", mismatchesB);
+    }
+
+
+
+
+
 </script>
 
 <main>
@@ -282,6 +326,12 @@ console.log("Mismatches B:", mismatchesB);
                     on:click={() => activeTab = 'mismatchesB'}
                 >
                     ❌ In File B only ({mismatchesB.length})
+                </button>
+            </div>
+            
+            <div class="download-section">
+                <button on:click={downloadResults} class="download-button">
+                    Download Current Tab
                 </button>
             </div>
 
@@ -590,15 +640,20 @@ console.log("Mismatches B:", mismatchesB);
     /* Add this for the feedback link */
     .feedback-link {
         display: inline-block;
-        margin-bottom: 1.5rem;
         font-size: 0.9rem;
-        font-weight: 500;
-        color: #3498db;
-        text-decoration: underline;
-        text-underline-offset: 3px;
+        font-weight: 600;
+        color: white; /* White text */
+        background-color: #3498db; /* Blue background */
+        border: none; /* No border */
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background-color 0.2s ease, transform 0.1s ease;
     }
+
     .feedback-link:hover {
-        color: #2980b9;
+        background-color: #2980b9; /* Darker blue on hover */
+        transform: translateY(-1px);
     }
     .page-links {
         display: flex;
@@ -612,5 +667,29 @@ console.log("Mismatches B:", mismatchesB);
     .link-divider {
         color: #ccc;
         font-size: 0.9rem;
+    }
+
+    .download-section {
+        padding: 1rem 1.5rem;
+        background-color: #f9f9f9;
+        border-bottom: 1px solid #eee;
+        text-align: right; /* Aligns button to the right */
+    }
+
+    .download-button {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: white;
+        background-color: #3498db;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .download-button:hover {
+        background-color: #2980b9;
     }
 </style>

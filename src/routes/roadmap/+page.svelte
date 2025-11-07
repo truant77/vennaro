@@ -5,8 +5,8 @@
 <main>
     <h1>Our Public Roadmap</h1>
     <p>
-        We build what our users need. 
-        <a href="https://forms.gle/uGXSuYcz1kZxgcvq9" target="_blank">Add your ideas</a>!
+        We build what our users need! <br><br>
+        <a href="https://forms.gle/uGXSuYcz1kZxgcvq9" target="_blank">Add your ideas</a>
     </p>
 
     <div class="roadmap-grid">
@@ -14,13 +14,13 @@
             <h2>✅ Shipped</h2>
             <ul>
                 <li>Core CSV Compare & Merge</li>
-                <li>Freemium Paywall (1000 rows)</li>
+                <li>Freemium Paywall (500 rows)</li>
                 <li>PWA "Add to Home Screen"</li>
-            </ul>
+            </ul>   
         </section>
 
         <section class="roadmap-column">
-            <h2>Building Next</h2>
+            <h2>🛠️ Building Next</h2>
             <ul>
                 <li>XLSX (.xls, .xlsx) File Support</li>
             </ul>
@@ -76,11 +76,39 @@
     a {
         color: #3498db;
         font-weight: 500;
+
+        /* Add these lines to make it a button */
+        display: inline-block;
+        background-color: #ecf0f1;
+        color: #34495e;
+        border: 1px solid #bdc3c7;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    a:hover {
+        background-color: #e2e6e8;
+        transform: translateY(-1px);
     }
     .back-link {
         display: inline-block;
         margin-top: 2rem;
         font-weight: 600;
         font-size: 1.1rem;
+
+        /* Add/replace with button styles */
+        background-color: #3498db;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        text-decoration: none;
+        border: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+        background-color: #2980b9;
     }
 </style>

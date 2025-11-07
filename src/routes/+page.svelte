@@ -46,7 +46,7 @@
             <div class="feature-item">
                 <h3>📈 Unlimited Power</h3>
                 <p>
-                    Our free tier handles 1,000 rows. Upgrade to Pro for
+                    Our free tier gives you 500 rows to play with. Upgrade to Pro for
                     unlimited rows and full XLSX support.
                 </p>
             </div>
@@ -113,15 +113,14 @@
         font-weight: 600;
         padding: 0.75rem 1.5rem;
         border-radius: 6px;
-        background-color: #fff;
-        color: #333;
-        border: 1px solid #ccc;
+        background-color: #3498db; /* Blue background */
+        color: white; /* White text */
+        border: none; /* No border */
         text-decoration: none;
         transition: background-color 0.2s ease;
     }
     :global(.cta-secondary:hover) {
-        background-color: #eaf6ff;
-        cursor: pointer;
+        background-color: #2980b9; /* Darker blue on hover */
     }
 
     .features {
