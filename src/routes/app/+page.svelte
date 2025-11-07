@@ -3,6 +3,7 @@
     // STEP 1: SCRIPT (JavaScript)
     // ---------------------------------
     import * as Papa from 'papaparse';
+    import { tick } from 'svelte';
     import PayfastButton from '$lib/components/PayfastButton.svelte';
     import logo from '$lib/assets/icon-512.png';
 
@@ -18,6 +19,7 @@
     let headersB = [];
     let previewB = ''; // For the file preview
     let selectedKeyB = '';
+    let resultsHeading = null;
 
     // --- Result State Variables ---
     let matches = [];
@@ -122,7 +124,7 @@
      * This is our main "VLOOKUP" function from Week 1.
      * It's almost identical.
      */
-    function runComparison() {
+    async function runComparison() {
 
         // --- PAYWALL CHECK ---
         // Check if either file exceeds the free tier limit
@@ -203,6 +205,9 @@
     }
         hasResults = true; // Show the results section
         activeTab = 'matches'; // Default to the 'matches' tab
+
+        await tick(); // Waits for Svelte to render the results section
+        resultsHeading.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         console.log("--- Comparison Complete. Results are now in state. ---");
         console.log("Matches:", matches);
@@ -303,7 +308,7 @@
     </div>
     {#if hasResults}
         <section class="results-section">
-            <h2>Results</h2>
+            <h2 bind:this={resultsHeading}>Results</h2>
 
             <div class="tabs">
                 <button 
