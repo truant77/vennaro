@@ -1,224 +1,236 @@
 <script>
-    // ---------------------------------
-    // STEP 1: SCRIPT (JavaScript)
-    // ---------------------------------
-    import * as Papa from 'papaparse';
-    import { tick } from 'svelte';
-    import PayfastButton from '$lib/components/PayfastButton.svelte';
-    import logo from '$lib/assets/icon-512.png';
+  
+	// ---------------------------------
+	// STEP 1: SCRIPT (SVELTE 5)
+	// ---------------------------------
+	import * as Papa from 'papaparse';
+	import { tick } from 'svelte';
+	import PayfastButton from '$lib/components/PayfastButton.svelte';
+	import logo from '$lib/assets/icon-512.png';
 
-    // --- Svelte State Variables ---
-    // In Svelte, we just declare variables. When they change,
-    // the UI automatically updates. This replaces document.getElementById.
-    let dataA = null;
-    let headersA = [];
-    let previewA = ''; // For the file preview
-    let selectedKeyA = '';
+	// --- Svelte 5 State Variables ---
+	// We must use $state() to make variables reactive
+	let dataA = $state(null);
+	let headersA = $state([]);
+	let previewA = $state('');
+	let filenameA = $state('');
+	let selectedKeyA = $state('');
 
-    let dataB = null;
-    let headersB = [];
-    let previewB = ''; // For the file preview
-    let selectedKeyB = '';
-    let resultsHeading = null;
+	let dataB = $state(null);
+	let headersB = $state([]);
+	let previewB = $state('');
+	let filenameB = $state('');
+	let selectedKeyB = $state('');
 
-    // --- Result State Variables ---
-    let matches = [];
-    let mismatchesA = [];
-    let mismatchesB = [];
-    let activeTab = 'matches'; // Controls which result tab is showing
-    let resultsHeaders = []; // To store the headers for the results table
+	// --- Result State Variables ---
+	let matches = $state([]);
+	let mismatchesA = $state([]);
+	let mismatchesB = $state([]);
+	let activeTab = $state('matches');
+	let resultsHeaders = $state([]);
+	let hasResults = $state(false);
 
-    // This will track if a comparison has been run
-    let hasResults = false;
+	// --- Paywall State ---
+	let showUpgradeModal = $state(false);
+	const FREE_TIER_LIMIT = 1000;
 
-    // --- Reactive Variables ---
-    // This 'isReady' variable will automatically re-calculate
-    // whenever dataA or dataB changes. We use it to enable/disable the button.
-    $: isReady = dataA && dataB;
+	// --- Svelte 5 Derived State ---
+	// This replaces $: isReady
+	let isReady = $derived(dataA && dataB);
 
-    // --- Paywall State ---
-    let showUpgradeModal = false;
-    const FREE_TIER_LIMIT = 500; // Set to 5 for easy testing. We'll change this to 1000 later.
+	// --- Element Bindings ---
+	let resultsHeading = $state(null);
 
-    /**
-     * Handles file parsing for either File A or File B.
-     * This one function replaces both of our old 'addEventListener' calls.
-     */
-    async function handleFile(event, fileType) {
-        const file = event.target.files[0];
-        if (!file) return;
+	/**
+	 * Handles file parsing for either File A or File B.
+	 */
+	async function handleFile(event, fileType) {
+		const file = event.target.files[0];
+		if (!file) return;
+		const filename = file.name;
 
-        // 1. Generate the text preview
-        // We read the first 1024 bytes as text to show a quick preview.
-        const textPreview = await file.slice(0, 1024).text();
+		// 1. Generate the text preview
+		const textPreview = await file.slice(0, 1024).text();
 
-        // 2. Parse the full file with PapaParse
-        Papa.parse(file, {
-            header: true,
-            dynamicTyping: true,
-            skipEmptyLines: true,
-            complete: (results) => {
-                console.log(`File ${fileType} Parsed:`, results.data);
+		// 2. Parse the full file with PapaParse
+		Papa.parse(file, {
+			header: true,
+			dynamicTyping: true,
+			skipEmptyLines: true,
+			complete: (results) => {
+				console.log(`File ${fileType} Parsed:`, results.data);
 
-                // Update the correct Svelte variables,
-                // which will automatically update the UI.
-                if (fileType === 'A') {
-                    dataA = results.data;
-                    headersA = results.meta.fields;
-                    selectedKeyA = headersA[0]; // Auto-select first header
-                    previewA = textPreview;
-                } else {
-                    dataB = results.data;
-                    headersB = results.meta.fields;
-                    selectedKeyB = headersB[0]; // Auto-select first header
-                    previewB = textPreview;
-                }
-            },
-            error: (error) => console.error(`Error parsing File ${fileType}:`, error.message)
-        });
-    }
-/**
- * Handles downloading the currently active result set as a CSV file.
- */
- function downloadResults() {
-    let dataToExport = [];
-    let filename = 'results.csv';
+				if (fileType === 'A') {
+					dataA = results.data;
+					headersA = results.meta.fields;
+					selectedKeyA = headersA[0];
+					previewA = textPreview;
+					filenameA = filename;
+				} else {
+					dataB = results.data;
+					headersB = results.meta.fields;
+					selectedKeyB = headersB[0];
+					previewB = textPreview;
+					filenameB = filename;
+				}
+			},
+			error: (error) => console.error(`Error parsing File ${fileType}:`, error.message)
+		});
+	}
 
-    // 1. Get the data from the currently active tab
-    if (activeTab === 'matches') {
-        dataToExport = matches;
-        filename = 'matches.csv';
-    } else if (activeTab === 'mismatchesA') {
-        dataToExport = mismatchesA;
-        filename = 'mismatches_file_A.csv';
-    } else if (activeTab === 'mismatchesB') {
-        dataToExport = mismatchesB;
-        filename = 'mismatches_file_B.csv';
-    }
+	/**
+	 * Resets all state variables for a given file type (A or B).
+	 */
+	function resetFile(fileType) {
+		if (fileType === 'A') {
+			dataA = null;
+			headersA = [];
+			previewA = '';
+			selectedKeyA = '';
+			filenameA = '';
+		} else {
+			dataB = null;
+			headersB = [];
+			previewB = '';
+			selectedKeyB = '';
+			filenameB = '';
+		}
 
-    if (dataToExport.length === 0) {
-        alert("There's no data in this view to download.");
-        return;
-    }
+		// If we remove a file, any previous results are now invalid
+		hasResults = false;
+		matches = [];
+		mismatchesA = [];
+		mismatchesB = [];
+	}
 
-    // 2. Convert the array of objects back into a CSV string
-    // Papa.unparse is the reverse of Papa.parse
-    const csvString = Papa.unparse(dataToExport);
+	/**
+	 * This is our main "VLOOKUP" function.
+	 */
+	async function runComparison() {
+		// --- PAYWALL CHECK ---
+		if (dataA.length > FREE_TIER_LIMIT || dataB.length > FREE_TIER_LIMIT) {
+			console.warn(`Paywall triggered. File A: ${dataA.length} rows, File B: ${dataB.length} rows.`);
+			showUpgradeModal = true;
+			return;
+		}
+		// --- END PAYWALL CHECK ---
 
-    // 3. Create a "virtual" link to trigger the download
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
+		console.log("--- Running Comparison ---");
 
-    link.setAttribute('href', url);
-    link.setAttribute('download', filename);
-    link.style.visibility = 'hidden';
+		if (!selectedKeyA || !selectedKeyB) {
+			console.error("Please select match keys for both files.");
+			return;
+		}
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
+		console.log(`Matching File A on key "${selectedKeyA}" with File B on key "${selectedKeyB}"`);
 
+		// Create a fast lookup map from File B
+		const lookupMapB = new Map();
+		for (const row of dataB) {
+			const lookupValue = row[selectedKeyB];
+			if (lookupValue !== null && lookupValue !== undefined) {
+				lookupMapB.set(String(lookupValue), row);
+			}
+		}
+		console.log("Created lookup map from File B:", lookupMapB);
 
-    /**
-     * This is our main "VLOOKUP" function from Week 1.
-     * It's almost identical.
-     */
-    async function runComparison() {
+		// Iterate through File A and perform the lookup
+		let newMatches = [];
+		let newMismatchesA = [];
 
-        // --- PAYWALL CHECK ---
-        // Check if either file exceeds the free tier limit
-        if (dataA.length > FREE_TIER_LIMIT || dataB.length > FREE_TIER_LIMIT) {
-            console.warn(`Paywall triggered. File A: ${dataA.length} rows, File B: ${dataB.length} rows.`);
-            showUpgradeModal = true; // Show the modal
-            return; // Stop the function from running
-        }
-        // --- END PAYWALL CHECK ---
+		for (const rowA of dataA) {
+			const lookupValue = String(rowA[selectedKeyA]);
+			const matchInB = lookupMapB.get(lookupValue);
 
-        console.log("--- Running Comparison ---"); // This line should NOT be reached
+			if (matchInB) {
+				const mergedRow = { ...rowA, ...matchInB };
+				newMatches.push(mergedRow);
+			} else {
+				newMismatchesA.push(rowA);
+			}
+		}
 
-        if (!selectedKeyA || !selectedKeyB) {
-            console.error("Please select match keys for both files.");
-            return;
-        }
-        
-        console.log(`Matching File A on key "${selectedKeyA}" with File B on key "${selectedKeyB}"`);
+		// Find items in B not in A
+		const lookupMapA = new Map();
+		for (const row of dataA) {
+			lookupMapA.set(String(row[selectedKeyA]), row);
+		}
 
-        // Create a fast lookup map from File B
-        const lookupMapB = new Map();
-        for (const row of dataB) {
-            const lookupValue = row[selectedKeyB];
-            if (lookupValue !== null && lookupValue !== undefined) {
-                lookupMapB.set(String(lookupValue), row); // Convert key to string for safety
-            }
-        }
-        console.log("Created lookup map from File B:", lookupMapB);
+		let newMismatchesB = [];
+		for (const rowB of dataB) {
+			const lookupValue = String(rowB[selectedKeyB]);
+			if (!lookupMapA.has(lookupValue)) {
+				newMismatchesB.push(rowB);
+			}
+		}
 
-        // Iterate through File A and perform the lookup
-        matches = [];
-        mismatchesA = []; // In A, not in B
+		// --- Update State with Results ---
+		matches = newMatches;
+		mismatchesA = newMismatchesA;
+		mismatchesB = newMismatchesB;
 
-        for (const rowA of dataA) {
-            const lookupValue = String(rowA[selectedKeyA]); // Convert key to string
-            const matchInB = lookupMapB.get(lookupValue);
+		// Set up headers for the results table
+		if (matches.length > 0) {
+			resultsHeaders = Object.keys(matches[0]);
+		} else if (mismatchesA.length > 0) {
+			resultsHeaders = Object.keys(mismatchesA[0]);
+		} else if (mismatchesB.length > 0) {
+			resultsHeaders = Object.keys(mismatchesB[0]);
+		}
 
-            if (matchInB) {
-                const mergedRow = { ...rowA, ...matchInB };
-                matches.push(mergedRow);
-            } else {
-                mismatchesA.push(rowA);
-            }
-        }
+		hasResults = true;
+		activeTab = 'matches';
 
-        // Find items in B not in A
-        const lookupMapA = new Map();
-        for (const row of dataA) {
-            lookupMapA.set(String(row[selectedKeyA]), row); // Convert key to string
-        }
-        
-        mismatchesB = []; // In B, not in A
-        for (const rowB of dataB) {
-            const lookupValue = String(rowB[selectedKeyB]);
-            if (!lookupMapA.has(lookupValue)) {
-                mismatchesB.push(rowB);
-            }
-        }
+		// Auto-scroll to results
+		await tick();
+		resultsHeading.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    // --- Update State with Results ---
-    // Svelte's reactivity will automatically update the UI
-    // when we assign these new array values.
+		console.log("--- Comparison Complete. Results are now in state. ---");
+		console.log("Matches:", matches);
+		console.log("Mismatches A:", mismatchesA);
+		console.log("Mismatches B:", mismatchesB);
+	}
 
-    // We use the spread operator '...' to create a new array,
-    // which guarantees Svelte detects the change.
-    matches = [...matches];
-    mismatchesA = [...mismatchesA];
-    mismatchesB = [...mismatchesB];
+	/**
+	 * Handles downloading the currently active result set as a CSV file.
+	 */
+	function downloadResults() {
+		let dataToExport = [];
+		let filename = 'results.csv';
 
-    // Set up headers for the results table
-    // We'll just use the headers from the 'matches' array (which is a merge)
-    if (matches.length > 0) {
-        resultsHeaders = Object.keys(matches[0]);
-    } else if (mismatchesA.length > 0) {
-        resultsHeaders = Object.keys(mismatchesA[0]);
-    } else if (mismatchesB.length > 0) {
-        resultsHeaders = Object.keys(mismatchesB[0]);
-    }
-        hasResults = true; // Show the results section
-        activeTab = 'matches'; // Default to the 'matches' tab
+		if (activeTab === 'matches') {
+			dataToExport = matches;
+			filename = 'matches.csv';
+		} else if (activeTab === 'mismatchesA') {
+			dataToExport = mismatchesA;
+			filename = 'mismatches_file_A.csv';
+		} else if (activeTab === 'mismatchesB') {
+			dataToExport = mismatchesB;
+			filename = 'mismatches_file_B.csv';
+		}
 
-        await tick(); // Waits for Svelte to render the results section
-        resultsHeading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		if (dataToExport.length === 0) {
+			alert("There's no data in this view to download.");
+			return;
+		}
 
-        console.log("--- Comparison Complete. Results are now in state. ---");
-        console.log("Matches:", matches);
-        console.log("Mismatches A:", mismatchesA);
-        console.log("Mismatches B:", mismatchesB);
-    }
+		// Convert the array of objects back into a CSV string
+		const csvString = Papa.unparse(dataToExport);
 
+		// Create a "virtual" link to trigger the download
+		const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+		const link = document.createElement('a');
+		const url = URL.createObjectURL(blob);
 
+		link.setAttribute('href', url);
+		link.setAttribute('download', filename);
+		link.style.visibility = 'hidden';
 
-
-
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+  
 </script>
 
 <main>
@@ -245,13 +257,26 @@
     <div class="container">
         <div class="card">
             <h2>File A (Main File)</h2>
-            <input 
-                type="file" 
-                accept=".csv" 
-                on:change={(event) => handleFile(event, 'A')} 
-            />
-            
-            {#if headersA.length > 0}
+        
+            {#if !dataA}
+                <input 
+                    type="file" 
+                    accept=".csv" 
+                    on:change={(event) => handleFile(event, 'A')} 
+                />
+            {:else}
+            <div class="file-info-header">
+                <span class="success-icon">✓</span>
+                <strong class="filename" title={filenameA}>{filenameA}</strong>
+                <button 
+                    on:click={() => resetFile('A')} 
+                    class="remove-button-subtle" 
+                    title="Remove file"
+                >
+                    &times;
+                </button>
+            </div>
+        
                 <div class="controls">
                     <label for="keyA">Match on column:</label>
                     <select id="keyA" bind:value={selectedKeyA}>
@@ -260,7 +285,7 @@
                         {/each}
                     </select>
                 </div>
-
+        
                 <div class="preview-box">
                     <strong>Preview:</strong>
                     <pre>{previewA}</pre>
@@ -270,13 +295,26 @@
 
         <div class="card">
             <h2>File B (Lookup File)</h2>
-            <input 
-                type="file" 
-                accept=".csv" 
-                on:change={(event) => handleFile(event, 'B')} 
-            />
-
-            {#if headersB.length > 0}
+        
+            {#if !dataB}
+                <input 
+                    type="file" 
+                    accept=".csv" 
+                    on:change={(event) => handleFile(event, 'B')} 
+                />
+            {:else}
+            <div class="file-info-header">
+                <span class="success-icon">✓</span>
+                <strong class="filename" title={filenameB}>{filenameB}</strong>
+                <button 
+                    on:click={() => resetFile('B')} 
+                    class="remove-button-subtle" 
+                    title="Remove file"
+                >
+                    &times;
+                </button>
+            </div>
+        
                 <div class="controls">
                     <label for="keyB">Match on column:</label>
                     <select id="keyB" bind:value={selectedKeyB}>
@@ -285,7 +323,7 @@
                         {/each}
                     </select>
                 </div>
-
+        
                 <div class="preview-box">
                     <strong>Preview:</strong>
                     <pre>{previewB}</pre>
@@ -421,6 +459,10 @@
 
     h1 {
         color: #2c3e50;
+        text-align: center;
+    }
+    p {
+        text-align: center;
     }
 
     .container {
@@ -435,6 +477,52 @@
         padding: 1.5rem;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
+
+    .file-info-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem; /* Space between icon, name, and button */
+        background-color: #f9f9f9;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+
+    .remove-button-subtle {
+        background: none;
+        border: none;
+        color: #95a5a6; /* Subtle grey */
+        font-size: 1.25rem;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 0 0.25rem;
+        border-radius: 4px;
+        margin-left: auto; /* Pushes it to the far right */
+        line-height: 1;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+    .remove-button-subtle:hover {
+        background-color: #ecf0f1; /* Light grey on hover */
+        color: #e74c3c; /* Red... but only on hover */
+    }
+
+    .success-icon {
+    color: #27ae60; /* Green */
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.filename {
+    flex-grow: 1; /* Takes up remaining space */
+    font-size: 0.9rem;
+    color: #333;
+
+    /* Prevents long filenames from breaking the layout */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
     .controls {
         margin-top: 1rem;
