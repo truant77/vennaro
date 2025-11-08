@@ -1,12 +1,17 @@
+<script>
+	import logo from '$lib/assets/icon-512.png'; // <-- ADD THIS
+</script>
+
 <svelte:head>
     <title>Our Roadmap - Data Merge Tool</title>
 </svelte:head>
 
 <main>
+    <img src={logo} alt="Data Merge Logo" class="logo" />
     <h1>Our Public Roadmap</h1>
     <p>
         We build what our users need! <br><br>
-        <a href="https://forms.gle/uGXSuYcz1kZxgcvq9" target="_blank">Add your ideas</a>
+        <a href="https://forms.gle/uGXSuYcz1kZxgcvq9" target="_blank" class="back-link">Add your ideas</a>
     </p>
 
     <div class="roadmap-grid">
@@ -49,12 +54,26 @@
     }
     h1 {
         color: #2c3e50;
+        text-align: center;
+        font-size: 2.2rem;
+    }
+    p {
+        text-align: center;
+    }
+
+    /* Add this for the logo */
+    .logo {
+        width: 60px;
+        height: 60px;
+        display: block;
+        margin: 0 auto 1rem auto;
     }
     .roadmap-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 2rem;
         margin: 2rem 0;
+        text-align: center;
     }
     .roadmap-column {
         background: #f9f9f9;
@@ -93,12 +112,14 @@
         transform: translateY(-1px);
     }
     .back-link {
-        display: inline-block;
-        margin-top: 2rem;
+    /* This combination will center the button */
+        display: block;
+        width: fit-content;
+        margin: 2rem auto 0 auto;
+
+        /* These are your existing button styles */
         font-weight: 600;
         font-size: 1.1rem;
-
-        /* Add/replace with button styles */
         background-color: #3498db;
         color: white;
         padding: 0.75rem 1.5rem;

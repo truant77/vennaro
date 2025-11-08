@@ -262,14 +262,14 @@
                 <input 
                     type="file" 
                     accept=".csv" 
-                    on:change={(event) => handleFile(event, 'A')} 
+                    onchange={(event) => handleFile(event, 'A')} 
                 />
             {:else}
             <div class="file-info-header">
                 <span class="success-icon">✓</span>
                 <strong class="filename" title={filenameA}>{filenameA}</strong>
                 <button 
-                    on:click={() => resetFile('A')} 
+                    onclick={() => resetFile('A')} 
                     class="remove-button-subtle" 
                     title="Remove file"
                 >
@@ -300,14 +300,14 @@
                 <input 
                     type="file" 
                     accept=".csv" 
-                    on:change={(event) => handleFile(event, 'B')} 
+                    onchange={(event) => handleFile(event, 'B')} 
                 />
             {:else}
             <div class="file-info-header">
                 <span class="success-icon">✓</span>
                 <strong class="filename" title={filenameB}>{filenameB}</strong>
                 <button 
-                    on:click={() => resetFile('B')} 
+                    onclick={() => resetFile('B')} 
                     class="remove-button-subtle" 
                     title="Remove file"
                 >
@@ -334,7 +334,7 @@
 
     <div class="run-section">
         <button 
-            on:click={runComparison} 
+            onclick={runComparison} 
             disabled={!isReady}
         >
             {#if isReady}
@@ -352,28 +352,28 @@
                 <button 
                     class="tab-button" 
                     class:active={activeTab === 'matches'}
-                    on:click={() => activeTab = 'matches'}
+                    onclick={() => activeTab = 'matches'}
                 >
                     ✅ Matches ({matches.length})
                 </button>
                 <button 
                     class="tab-button"
                     class:active={activeTab === 'mismatchesA'}
-                    on:click={() => activeTab = 'mismatchesA'}
+                    onclick={() => activeTab = 'mismatchesA'}
                 >
                     ❌ In File A only ({mismatchesA.length})
                 </button>
                 <button 
                     class="tab-button"
                     class:active={activeTab === 'mismatchesB'}
-                    on:click={() => activeTab = 'mismatchesB'}
+                    onclick={() => activeTab = 'mismatchesB'}
                 >
                     ❌ In File B only ({mismatchesB.length})
                 </button>
             </div>
             
             <div class="download-section">
-                <button on:click={downloadResults} class="download-button">
+                <button onclick={downloadResults} class="download-button">
                     Download Current Tab
                 </button>
             </div>
@@ -419,8 +419,8 @@
         </section>
     {/if}
     {#if showUpgradeModal}
-        <div class="modal-backdrop" on:click={() => showUpgradeModal = false}>
-            <div class="modal" on:click|stopPropagation>
+        <div class="modal-backdrop" onclick={() => showUpgradeModal = false} role="button" tabindex="0">
+            <div class="modal" onclick={(event) => event.stopPropagation()}>
                 <h2>Free Limit Reached</h2>
                 <p>
                     Your file has more than {FREE_TIER_LIMIT} rows.
@@ -434,7 +434,7 @@
                     Upgrade to Pro (R79.99/mo)
                 </PayfastButton>
 
-                <button class="modal-close" on:click={() => showUpgradeModal = false}>
+                <button class="modal-close" onclick={() => showUpgradeModal = false}>
                     &times;
                 </button>
             </div>
@@ -511,18 +511,18 @@
     color: #27ae60; /* Green */
     font-weight: bold;
     font-size: 1.1rem;
-}
+    }
 
-.filename {
-    flex-grow: 1; /* Takes up remaining space */
-    font-size: 0.9rem;
-    color: #333;
+    .filename {
+        flex-grow: 1; /* Takes up remaining space */
+        font-size: 0.9rem;
+        color: #333;
 
-    /* Prevents long filenames from breaking the layout */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+        /* Prevents long filenames from breaking the layout */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
     .controls {
         margin-top: 1rem;
@@ -701,23 +701,7 @@
         cursor: pointer;
     }
 
-    .payfast-button {
-        display: inline-block;
-        background-color: #22a04a; /* Payfast-ish Green */
-        color: #fff;
-        font-weight: 600;
-        text-decoration: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 6px;
-        margin-top: 1rem;
-        transition: background-color 0.2s ease;
-    }
-
-    .payfast-button:hover {
-        background-color: #1b803a;
-    }
-
-    /* Add this for the logo */
+   /* Add this for the logo */
     .logo {
         width: 60px;
         height: 60px;
@@ -754,12 +738,6 @@
         align-items: center;
         gap: 0.75rem; /* Adds a bit of space */
         margin-bottom: 1.5rem;
-    }
-
-    /* We already have .feedback-link, just add this */
-    .link-divider {
-        color: #ccc;
-        font-size: 0.9rem;
     }
 
     .download-section {

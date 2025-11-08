@@ -17,7 +17,7 @@
             100% in your browser.
         </p>
         <div class="cta-buttons">
-            <button class="cta-primary" on:click={goToApp}>
+            <button class="cta-primary" onclick={goToApp}>
                 Go to App (Free)
             </button>
             <PayfastButton class="cta-secondary">
@@ -64,12 +64,12 @@
     main {
         max-width: 960px;
         margin: 0 auto;
-        padding: 2rem;
+        padding: 1rem;
     }
 
     header {
         text-align: center;
-        padding: 4rem 1rem;
+        padding: 2rem 1rem;
         background-color: #f4f7f6;
         border-radius: 8px;
     }
@@ -77,7 +77,7 @@
     h1 {
         font-size: 3rem;
         font-weight: 700;
-        margin-bottom: 1rem;
+        margin:0;
     }
 
     .subhead {
@@ -124,13 +124,13 @@
     }
 
     .features {
-        padding: 4rem 0;
+
         text-align: center;
     }
 
     .feature-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 2rem;
         margin-top: 2rem;
         text-align: left;
