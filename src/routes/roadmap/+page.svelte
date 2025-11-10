@@ -1,13 +1,13 @@
 <script>
-	import logo from '$lib/assets/icon-512.png'; // <-- ADD THIS
+	import logo from '$lib/assets/vennaro_logo.png'; // <-- ADD THIS
 </script>
 
 <svelte:head>
-    <title>Our Roadmap - Data Merge Tool</title>
+    <title>Our Roadmap - Vennaro</title>
 </svelte:head>
 
 <main>
-    <img src={logo} alt="Data Merge Logo" class="logo" />
+    <img src={logo} alt="Vennaro Logo" class="logo" />
     <h1>Our Public Roadmap</h1>
     <p>
         We build what our users need! <br><br>
@@ -52,7 +52,6 @@
     main {
         max-width: 960px;
         margin: 0 auto;
-        padding: 2rem;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         color: #333;
     }
@@ -67,8 +66,8 @@
 
     /* Add this for the logo */
     .logo {
-        width: 60px;
-        height: 60px;
+        
+        height: 150px;
         display: block;
         margin: 0 auto 1rem auto;
     }
@@ -121,7 +120,7 @@
     /* This combination will center the button */
         display: block;
         width: fit-content;
-        margin: 2rem auto 0 auto;
+        margin: 0rem auto 0 auto;
 
         /* These are your existing button styles */
         font-weight: 600;
@@ -137,5 +136,6 @@
 
     .back-link:hover {
         background-color: #2980b9;
+        transform: none;
     }
 </style>

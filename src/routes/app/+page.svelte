@@ -327,7 +327,7 @@
         <img src={logo} alt="Data Merge Logo" class="logo" />
     </a>
 
-    <h1>Data Merge Tool</h1>
+    
     <p>Upload two Excel or CSV files, pick your match columns, and let the magic happen — no formulas, just instant clarity.</p>
 
     <div class="page-links">
@@ -864,8 +864,8 @@
 
    /* Add this for the logo */
     .logo {
-        width: 60px;
-        height: 60px;
+        
+        height: 150px;
         display: block;
         margin: 0 auto 1rem auto;
     }

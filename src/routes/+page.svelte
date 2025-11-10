@@ -1,7 +1,7 @@
 <script>
     import { goto } from '$app/navigation';
     import PayfastButton from '$lib/components/PayfastButton.svelte';
-    import logo from '$lib/assets/icon-512.png';
+    import logo from '$lib/assets/vennaro_logo.png';
 
     function goToApp() {
         goto('/app'); // Navigates user to the app page
@@ -18,10 +18,10 @@
         </p>
         <div class="cta-buttons">
             <button class="cta-primary" onclick={goToApp}>
-                Go to App (Free)
+                Use App for Free
             </button>
             <PayfastButton class="cta-secondary">
-                Upgrade to Pro (R79.99/mo)
+                Upgrade to Pro
             </PayfastButton>
         </div>
     </header>
@@ -47,7 +47,7 @@
                 <h3>📈 Unlimited Power</h3>
                 <p>
                     Our free tier gives you 500 rows to play with. Upgrade to Pro for
-                    unlimited rows and full XLSX support.
+                    unlimited rows and Premium features.
                 </p>
             </div>
         </div>
@@ -69,7 +69,7 @@
 
     header {
         text-align: center;
-        padding: 2rem 1rem;
+        padding: 1rem 0.5rem 1.5rem 0.5rem;
         background-color: #f4f7f6;
         border-radius: 8px;
     }
@@ -130,7 +130,7 @@
 
     .feature-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 2rem;
         margin-top: 2rem;
         text-align: left;
@@ -139,7 +139,7 @@
     .feature-item {
         background: #fcfcfc;
         border: 1px solid #eee;
-        padding: 1.5rem;
+        padding: 1rem;
         border-radius: 8px;
     }
 
@@ -149,8 +149,8 @@
     
     /* Add this for the logo */
     .logo {
-        width: 80px;
-        height: 80px;
-        margin-bottom: 1rem;
+        
+        height: 125px;
+        margin-bottom: 0.5rem;
     }
 </style>
