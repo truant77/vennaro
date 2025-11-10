@@ -248,7 +248,7 @@
 	/**
 	 * Handles downloading the currently active result set as a CSV file.
 	 */
-	function downloadResults() {
+	function downloadCSV() {
 		let dataToExport = [];
 		let filename = 'results.csv';
 
@@ -284,6 +284,41 @@
 		link.click();
 		document.body.removeChild(link);
 	}
+
+    /**
+     * Handles downloading the currently active result set as an Excel file.
+     */
+    function downloadExcel() {
+        let dataToExport = [];
+        let filename = 'results.xlsx';
+
+        // 1. Get the data from the currently active tab
+        if (activeTab === 'matches') {
+            dataToExport = matches;
+            filename = 'matches.xlsx';
+        } else if (activeTab === 'mismatchesA') {
+            dataToExport = mismatchesA;
+            filename = 'mismatches_file_A.xlsx';
+        } else if (activeTab === 'mismatchesB') {
+            dataToExport = mismatchesB;
+            filename = 'mismatches_file_B.xlsx';
+        }
+
+        if (dataToExport.length === 0) {
+            alert("There's no data in this view to download.");
+            return;
+        }
+
+        // 2. Convert the array of objects (JSON) into an Excel sheet
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+        // 3. Create a new workbook and add the sheet
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Results'); // "Results" is the tab name
+
+        // 4. Trigger the download of the Excel file
+        XLSX.writeFile(workbook, filename);
+    }
   
 </script>
 
@@ -465,8 +500,11 @@
             </div>
             
             <div class="download-section">
-                <button onclick={downloadResults} class="download-button">
-                    Download Current Tab
+                <button onclick={downloadCSV} class="download-button csv">
+                    Download as .csv
+                </button>
+                <button onclick={downloadExcel} class="download-button excel">
+                    Download as .xlsx
                 </button>
             </div>
 
@@ -867,10 +905,15 @@
         padding: 1rem 1.5rem;
         background-color: #f9f9f9;
         border-bottom: 1px solid #eee;
-        text-align: right; /* Aligns button to the right */
+        text-align: right;
+        display: flex; /* <-- ADD THIS */
+        justify-content: flex-end; /* <-- ADD THIS */
+        gap: 0.75rem; /* Aligns button to the right */
+        flex-direction: column; /* <-- ADD THIS */
+        
     }
 
-    .download-button {
+    .download-button.csv {
         font-size: 0.9rem;
         font-weight: 600;
         color: white;
@@ -883,7 +926,28 @@
         transition: background-color 0.2s ease;
     }
 
-    .download-button:hover {
+    .download-button.csv:hover {
         background-color: #2980b9;
+    }
+
+    /* This is a new class for the Excel button */
+    .download-button.excel {
+        /* Base styles (copied from the CSV button) */
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        /* Excel Green */
+        background-color: #217346; 
+    }
+
+    .download-button.excel:hover {
+        background-color: #164b2c; /* Darker Green */
     }
 </style>
