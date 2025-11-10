@@ -293,7 +293,7 @@
     </a>
 
     <h1>Data Merge Tool</h1>
-    <p>Upload two CSV files, select the columns to match, and run the comparison.</p>
+    <p>Upload two Excel or CSV files, pick your match columns, and let the magic happen — no formulas, just instant clarity.</p>
 
     <div class="page-links">
     <a 

@@ -21,13 +21,15 @@
                 <li>Core CSV Compare & Merge</li>
                 <li>Freemium Paywall (500 rows)</li>
                 <li>PWA "Add to Home Screen"</li>
-            </ul>   
+                <li>Excel (.xlsx & .xls) File Support</li>
+                <li>File Preview Table</li>
+            </ul>
         </section>
 
         <section class="roadmap-column">
             <h2>🛠️ Building Next</h2>
             <ul>
-                <li>XLSX (.xls, .xlsx) File Support</li>
+                <li>Automated Pro License Delivery</li>
             </ul>
         </section>
 
@@ -37,6 +39,8 @@
                 <li>Data "Update" Function</li>
                 <li>Saving Column Map Templates</li>
                 <li>Fuzzy Matching</li>
+                <li>Export Column Selector</li>
+                <li>Drag-and-Drop File Uploads</li>
             </ul>
         </section>
     </div>
@@ -85,12 +89,14 @@
         margin-top: 0;
         border-bottom: 2px solid #3498db;
         padding-bottom: 0.5rem;
+        font-size: 1.25rem;
     }
     ul {
         padding-left: 1.25rem;
     }
     li {
         margin-bottom: 0.5rem;
+        text-align: left;
     }
     a {
         color: #3498db;

@@ -11,10 +11,10 @@
 <main>
     <header>
         <img src={logo} alt="Data Merge Logo" class="logo" />
-        <h1>The Fastest Way to Compare & Merge CSVs</h1>
+        <h1>Instant Data Matching. <br>Zero Spreadsheet Drama.</h1>
         <p class="subhead">
-            Stop fighting with VLOOKUP. Get your data matched in seconds,
-            100% in your browser.
+            Compare and merge Excel or CSV files without formulas, downloads, or frustration.
+            Match data in a flash, right in your browser.
         </p>
         <div class="cta-buttons">
             <button class="cta-primary" onclick={goToApp}>
