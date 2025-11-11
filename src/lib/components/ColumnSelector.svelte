@@ -130,10 +130,11 @@
     }
 
     .column-list h4 {
-        margin: 0 0 0.5rem 0;
-        padding-bottom: 0.5rem;
+        margin: 0; /* Reset margin */
+        padding: 1rem 0.25rem; /* Add vertical padding */
         border-bottom: 1px solid #ccc;
         font-size: 0.9rem;
+        line-height: 1; /* Ensure text has vertical space */
 
         /* Truncate long filenames */
         white-space: nowrap;

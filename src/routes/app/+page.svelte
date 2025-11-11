@@ -494,7 +494,7 @@
     </div>
 
     <div class="run-section">
-        <button 
+        <button class="button-primary"
             onclick={runComparison} 
             disabled={!isReady}
         >
@@ -760,6 +760,27 @@
         margin-top: 2rem;
     }
 
+    .button-primary {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        background-color: #3498db;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .button-primary:hover {
+        background-color: #2980b9;
+    }
+
+    /* This style will apply when 'disabled' is true */
+    .button-primary:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
     /* This style is applied when the button's 'disabled' attribute is true */
     button:disabled {
         background-color: #bdc3c7;
