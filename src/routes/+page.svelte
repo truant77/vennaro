@@ -1,6 +1,5 @@
 <script>
     import { goto } from '$app/navigation';
-    import PayfastButton from '$lib/components/PayfastButton.svelte';
     import logo from '$lib/assets/vennaro_logo.png';
 
     function goToApp() {
@@ -17,12 +16,12 @@
             Match data in a flash, right in your browser.
         </p>
         <div class="cta-buttons">
-            <button class="cta-primary" onclick={goToApp}>
+            <button class="button-primary" onclick={goToApp}>
                 Use App for Free<br>(500 rows)
             </button>
-            <PayfastButton class="cta-secondary">
+            <a href="https://holmbrewed.lemonsqueezy.com/buy/9672a88b-f6a4-4218-a1a2-099aa89d6998?embed=1&logo=0&discount=0" class="button-primary lemonsqueezy-button">
                 Upgrade to Pro<br>($19/year)
-            </PayfastButton>
+            </a>
         </div>
     </header>
 
@@ -93,21 +92,6 @@
         gap: 1rem;
     }
 
-    .cta-primary {
-        font-size: 1rem;
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 6px;
-        background-color: #3498db;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-    }
-    .cta-primary:hover {
-        background-color: #2980b9;
-    }
-
     :global(.cta-secondary) {
         font-size: 1rem;
         font-weight: 600;
@@ -152,5 +136,34 @@
         
         height: 125px;
         margin-bottom: 0.5rem;
+    }
+
+    .button-primary, :global(.lemonsqueezy-button) {
+        /* Layout & Box Model */
+        display: inline-block; 
+        box-sizing: border-box;
+        padding: 0.6rem 1.1rem; /* <-- REDUCED PADDING */
+        border: none;
+        border-radius: 6px;
+
+        /* Typography */
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 0.9rem; /* <-- REDUCED FONT */
+        font-weight: 600;
+        line-height: 1.2; /* <-- REDUCED LINE HEIGHT */
+        color: white;
+        text-decoration: none; 
+        text-align: center; 
+        vertical-align: middle;
+
+        /* Appearance */
+        background-color: #3498db;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .button-primary:hover {
+        background-color: #2980b9;
+        text-decoration: none; /* <-- Also add here */
     }
 </style>

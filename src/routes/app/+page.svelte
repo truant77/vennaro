@@ -5,7 +5,6 @@
 	// ---------------------------------
 	import * as Papa from 'papaparse';
 	import { tick } from 'svelte';
-	import PayfastButton from '$lib/components/PayfastButton.svelte';
 	import logo from '$lib/assets/vennaro_logo.png';
     import * as XLSX from 'xlsx';
     import Modal from '$lib/components/Modal.svelte';
@@ -39,7 +38,7 @@
 	let hasResults = $state(false);
 
 	// --- Paywall State ---
-	let showUpgradeModal = $state(false);
+	
     let isProUser = $state(false);
     let showLicenseModal = $state(false);
 	const FREE_TIER_LIMIT = 500;
@@ -188,11 +187,20 @@
 	 */
 	async function runComparison() {
 		// --- PAYWALL CHECK ---
-		if (dataA.length > FREE_TIER_LIMIT || dataB.length > FREE_TIER_LIMIT) {
-			console.warn(`Paywall triggered. File A: ${dataA.length} rows, File B: ${dataB.length} rows.`);
-			showUpgradeModal = true;
-			return;
-		}
+		if ((dataA.length > FREE_TIER_LIMIT || dataB.length > FREE_TIER_LIMIT) && isProUser === false) {
+            console.warn(`Paywall triggered. Popping Lemon Squeezy checkout.`);
+
+            // Check if the LemonSqueezy script is loaded and ready
+            if (typeof LemonSqueezy !== 'undefined') {
+                // This function is provided by lemon.js to open overlays
+                LemonSqueezy.Url.Open("https://holmbrewed.lemonsqueezy.com/buy/9672a88b-f6a4-4218-a1a2-099aa89d6998?embed=1&logo=0&discount=0");
+            } else {
+                // Fallback in case the script fails to load
+                alert("Redirecting to checkout...");
+                window.location.href = "https://holmbrewed.lemonsqueezy.com/buy/9672a88b-f6a4-4218-a1a2-099aa89d6998?embed=1&logo=0&discount=0";
+            }
+            return; // Stop the function from running
+        }
 		// --- END PAYWALL CHECK ---
 
 		console.log("--- Running Comparison ---");
@@ -609,37 +617,7 @@
             </div>
         </section>
     {/if}
-    {#if showUpgradeModal}
-        <div class="modal-backdrop" 
-            onclick={() => showUpgradeModal = false} 
-            onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (showUpgradeModal = false)} 
-            role="button" 
-            tabindex="0">
-            <div class="modal" 
-                role="dialog" 
-                aria-modal="true" 
-                tabindex="-1"
-                onclick={(event) => event.stopPropagation()}
-                onkeydown={(event) => event.stopPropagation()}>
-                <h2>Free Limit Reached</h2>
-                <p>
-                    Your file has more than {FREE_TIER_LIMIT} rows.
-                </p>
-                <p>
-                    To process unlimited rows and access Premium features,
-                    please upgrade to <strong>Pro</strong> (one-time payment, no auto-renewal).
-                </p>
-
-                <PayfastButton class="payfast-button">
-                    Upgrade to Pro<br>($19/year)
-                </PayfastButton>
-
-                <button class="modal-close" onclick={() => showUpgradeModal = false}>
-                    &times;
-                </button>
-            </div>
-        </div>
-    {/if}
+    
 
     <Modal bind:open={showColumnSelector}>
         <ColumnSelector
@@ -915,46 +893,7 @@
     .data-table tr:hover {
         background-color: #f9f9f9;
     }
-    /* --- Modal Styles --- */
-    .modal-backdrop {
-        position: fixed; /* Sits on top of everything */
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10;
-    }
-
-    .modal {
-        background: #fff;
-        border-radius: 8px;
-        padding: 2rem;
-        width: 90%;
-        max-width: 500px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        position: relative; 
-        text-align: center;/* For the close button */
-    }
-
-    .modal h2 {
-        margin-top: 0;
-    }
-
-    .modal-close {
-        position: absolute;
-        top: 0.5rem;
-        right: 0.75rem;
-        font-size: 2rem;
-        font-weight: bold;
-        color: #aaa;
-        background: none;
-        border: none;
-        cursor: pointer;
-    }
+       
 
    /* Add this for the logo */
     .logo {
