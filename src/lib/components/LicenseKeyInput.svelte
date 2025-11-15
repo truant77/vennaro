@@ -189,4 +189,11 @@
         background-color: #e8f5e9;
         color: #217346;
     }
+
+    @media (max-width: 450px) {
+        /* Stacks the buttons vertically */
+        .actions {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>

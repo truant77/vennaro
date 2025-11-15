@@ -952,6 +952,13 @@
         margin-bottom: 1.5rem;
     }
 
+    @media (max-width: 700px) {
+        .page-links {
+            flex-direction: column; /* Stack them vertically */
+            align-items: stretch; /* Make them full-width */
+        }
+    }
+
     .download-section {
         padding: 1rem 1.5rem;
         background-color: #f9f9f9;

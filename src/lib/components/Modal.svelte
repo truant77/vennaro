@@ -56,10 +56,18 @@
         box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
         min-width: 400px;
         max-width: 90vw;
-
-        /* We set the modal itself one level higher,
-          so it appears on top of our *own* backdrop.
-        */
+        max-height: 85vh; 
+        overflow-y: auto;
         z-index: 100;
+    }
+
+    @media (max-width: 450px) {
+        .modal {
+            /* This is the fix. It removes the minimum width 
+            and lets the modal shrink to fit the screen.
+            */
+            min-width: 90vw;
+            padding: 1rem;
+        }
     }
 </style>

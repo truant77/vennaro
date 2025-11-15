@@ -92,37 +92,33 @@
         Select Columns to Export
         
     </h3>
-    <p>Check the columns you want to include in your download.</p>
+    <p>Select the columns you want to include in your download.</p>
 
     <div class="quick-actions">
-        <div class="button-group-left">
-            <button 
-                class:button-primary={!allSelected}
-                class:button-secondary={allSelected}
-                onclick={selectAll} 
-                disabled={allSelected}
-            >
-                Select All
+        <button 
+            class:button-primary={!allSelected}
+            class:button-secondary={allSelected}
+            onclick={selectAll} 
+            disabled={allSelected}
+        >
+            Select All
+        </button>
+        <button 
+            class:button-primary={!noneSelected}
+            class:button-secondary={noneSelected}
+            onclick={handleSelectNone} 
+            disabled={noneSelected}
+        >
+            Select None
+        </button>
+        
+        {#if !isProUser}
+            <button class="button-primary upgrade-button" onclick={handleUpgradeClick}>
+                Upgrade to Pro
             </button>
-            <button 
-                class:button-primary={!noneSelected}
-                class:button-secondary={noneSelected}
-                onclick={handleSelectNone} 
-                disabled={noneSelected}
-            >
-                Select None
-            </button>
-        </div>
-    
-        <div class="button-group-right">
-            {#if !isProUser}
-                <button class="button-primary" onclick={handleUpgradeClick}>
-                    Upgrade to Pro
-                </button>
-            {:else}
-                <img src={proBadge} alt="Pro User Badge" class="pro-badge-image" />
-            {/if}
-        </div>
+        {:else}
+            <img src={proBadge} alt="Pro User Badge" class="pro-badge-image" />
+        {/if}
     </div>
 
     <div class="column-grid">
@@ -201,7 +197,8 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        min-width: 600px;
+        width: 600px; /* Set a specific width for desktop */
+        max-width: 100%; /* Ensure it can shrink */
     }
     
     h3, p {
@@ -220,27 +217,24 @@
         vertical-align: middle;
     }
 
-    /* --- Quick Actions (Select All/None) --- */
+    /* --- Quick Actions (Desktop) --- */
     .quick-actions {
         display: flex;
-        justify-content: space-between; /* This is the key */
         align-items: center;
+        gap: 0.75rem;
     }
 
-    .button-group-left {
-        display: flex;
-        gap: 0.75rem; /* Keeps the two left buttons together */
-    }
-
-    .button-group-right {
-        /* This group is just a wrapper */
-    }
-    
-    /* This makes the "Upgrade" button move to the right */
-    .quick-actions .button-primary {
+    /* This is the magic line for desktop: 
+    it targets the Pro button OR the Pro badge 
+    and pushes it to the far right. */
+    .quick-actions > .upgrade-button,
+    .quick-actions > .pro-badge-image {
         margin-left: auto;
     }
 
+    /* --- Quick Actions (Mobile) --- */
+      
+    
     /* --- Column Lists --- */
     .column-grid {
         display: grid;
@@ -302,9 +296,17 @@
     .button-primary:hover {
         background-color: #2980b9;
     }
-    .button-primary:disabled, .button-secondary:disabled {
+    .button-primary:disabled,
+    .button-secondary:disabled {
+        background-color: #ecf0f1;
+        color: #34495e;
+        border: 1px solid #bdc3c7;
         opacity: 0.6;
         cursor: not-allowed;
+    }
+    .button-primary:disabled:hover,
+    .button-secondary:disabled:hover {
+        background-color: #ecf0f1;
     }
     .button-secondary {
         background-color: #ecf0f1;
@@ -314,9 +316,7 @@
     .button-secondary:hover {
         background-color: #e2e6e8;
     }
-    .button-secondary:disabled:hover {
-        background-color: #ecf0f1;
-    }
+    
     
     /* --- NEW SOFT GATE MODAL --- */
     .soft-gate-backdrop {
@@ -357,13 +357,31 @@
         margin-top: 1rem;
     }
 
-    .button-primary:disabled {
-        background-color: #ecf0f1; /* Grey background */
-        color: #34495e; /* Dark text */
-        border: 1px solid #bdc3c7; /* Grey border */
-        opacity: 0.6; /* Keep the fade */
+    
+    @media (max-width: 650px) {
+        /* This stacks the "File A" and "File B" lists */
+        .column-grid {
+            grid-template-columns: 1fr;
+        }
+
+        /* This stacks the bottom "Cancel" and "Confirm" buttons */
+        .final-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
+
+        .quick-actions {
+            flex-direction: column; /* Stack all items */
+            align-items: stretch;  /* Make all items full-width */
+            gap: 0.5rem;
+        }
+
+        /* We reset the desktop margin */
+        .quick-actions > .upgrade-button,
+        .quick-actions > .pro-badge-image {
+            margin-left: 0;
+        }
     }
-    .button-primary:disabled:hover {
-        background-color: #ecf0f1; /* Stop it from turning blue on hover */
-    }
+
 </style>

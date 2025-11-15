@@ -70,7 +70,7 @@
                 </p>
             </div>
             <div class="feature-item">
-                <h3>📈 Start Free. Scale with Ease</h3>
+                <h3>📈 Unlimited Scalability</h3>
                 <p>
                     Our free tier gives you 500 rows to play with. Upgrade to Pro for
                     unlimited rows and Premium features (one-time payment, no auto-renewal).
@@ -145,6 +145,18 @@
         gap: 2rem;
         margin-top: 2rem;
         text-align: left;
+    }
+
+    @media (max-width: 700px) {
+
+        .feature-grid {
+            grid-template-columns: 1fr; /* Force a single column */
+        }
+
+        .cta-buttons {
+            flex-direction: column; /* Stack the buttons */
+            align-items: stretch; /* Make them full-width */
+        }
     }
 
     .feature-item {
