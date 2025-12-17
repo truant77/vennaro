@@ -78,7 +78,7 @@ export default async (req, context) => {
             });
         }
     
-        // This is a generic server error
+        // This is a generic server error that isn't really helpful to the user
         return new Response(JSON.stringify({ error: "An unknown server error occurred. Please try again." }), {
             status: 500,
         });
