@@ -42,7 +42,7 @@
                 <img src={proBadge} alt="Pro User Badge" class="pro-badge-image" />
             {:else}
                 <a 
-                    href="https://holmbrewed.lemonsqueezy.com/buy/9672a88b-f6a4-4218-a1a2-099aa89d6998?embed=1&logo=0&discount=0" 
+                    href="https://holmbrewed.lemonsqueezy.com/buy/b15a9fab-2f08-43cb-97ed-3ea93217e9fc?embed=1&logo=0" 
                     class="button-primary lemonsqueezy-button"
                 >
                     Upgrade to Pro

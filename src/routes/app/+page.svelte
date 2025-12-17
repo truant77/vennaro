@@ -377,7 +377,7 @@
 
 <main>
     <a href="/" aria-label="Go to Homepage" class="logo-link">
-        <img src={logo} alt="Data Merge Logo" class="logo" />
+        <img src={logo} alt="VennaroLogo" class="logo" />
     </a>
 
     
@@ -617,7 +617,7 @@
             allColumnsB={headersB}
             fileA={filenameA}
             fileB={filenameB}
-            isProUser={isProUser}  overlayLink="https://holmbrewed.lemonsqueezy.com/buy/9672a88b-f6a4-4218-a1a2-099aa89d6998?embed=1&logo=0&discount=0" onCancel={() => showColumnSelector = false}
+            isProUser={isProUser}  overlayLink="https://holmbrewed.lemonsqueezy.com/buy/b15a9fab-2f08-43cb-97ed-3ea93217e9fc?embed=1&logo=0" onCancel={() => showColumnSelector = false}
             onConfirm={handleConfirmDownload}
         />
     </Modal>
@@ -662,7 +662,7 @@
                         class="button-primary"
                         onclick={() => {
                             if (typeof LemonSqueezy !== 'undefined') {
-                                LemonSqueezy.Url.Open("https://holmbrewed.lemonsqueezy.com/buy/9672a88b-f6a4-4218-a1a2-099aa89d6998?embed=1&logo=0&discount=0");
+                                LemonSqueezy.Url.Open("https://holmbrewed.lemonsqueezy.com/buy/b15a9fab-2f08-43cb-97ed-3ea93217e9fc?embed=1&logo=0");
                             }
                         }}
                     >
