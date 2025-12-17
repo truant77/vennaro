@@ -41,7 +41,7 @@ export default async (req, context) => {
 
         // 5. This is the magic: Ask Lemon Squeezy to validate the key
         // We call the 'validateLicense' function we imported.
-        const response = await validateLicense(key, {
+        const response = await validateLicense(String(key), {
             variantId: 734131,
         });
 
