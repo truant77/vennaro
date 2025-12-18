@@ -15,13 +15,17 @@
     } = $props();
 
     // --- STATE ---
+    // We now store "filename_columnname" to ensure uniqueness
     let selected = $state(new Set());
-    let showUpgradeModal = $state(false); // Controls our new "soft gate" modal
+    let showUpgradeModal = $state(false); 
     
     // THIS IS THE FIX for the "all selected" bug.
-    // This effect runs when the props change, resetting the selection.
+    // We map both arrays to their unique prefixed versions.
     $effect(() => {
-        selected = new Set([...allColumnsA, ...allColumnsB]);
+        selected = new Set([
+            ...allColumnsA.map(col => `${fileA}_${col}`), 
+            ...allColumnsB.map(col => `${fileB}_${col}`)
+        ]);
     });
 
     // --- DERIVED STATE ---
@@ -30,13 +34,12 @@
 
     // --- FUNCTIONS ---
     function selectAll() {
-        selected = new Set([...allColumnsA, ...allColumnsB]);
+        selected = new Set([
+            ...allColumnsA.map(col => `${fileA}_${col}`), 
+            ...allColumnsB.map(col => `${fileB}_${col}`)
+        ]);
     }
 
-    /**
-     * Handles the "Select None" button.
-     * If Free user, shows upgrade. If Pro, it works.
-     */
     function handleSelectNone() {
         if (isProUser) {
             selected = new Set();
@@ -46,38 +49,28 @@
     }
 
     /**
-     * Handles a click on any checkbox.
-     * If Free user, shows upgrade. If Pro, it works.
+     * UNIQUE KEY HANDLER
+     * Uses the prefixed key so "ID" in File A is different from "ID" in File B.
      */
-    function handleCheckboxClick(e, column) {
+    function handleCheckboxClick(e, compositeKey) {
         if (isProUser) {
-            // Pro user: normal checkbox logic
-            if (selected.has(column)) {
-                selected.delete(column);
+            if (selected.has(compositeKey)) {
+                selected.delete(compositeKey);
             } else {
-                selected.add(column);
+                selected.add(compositeKey);
             }
-            // This forces Svelte to see the change and update the derived state
             selected = new Set(selected);
-
         } else {
-            // Free user:
-            e.preventDefault(); // Prevent unchecking
-            showUpgradeModal = true; // Show the modal
+            e.preventDefault(); 
+            showUpgradeModal = true; 
         }
     }
 
-    /**
-     * This is the final "Pro" download button.
-     */
     function handleSubmit() {
-        const selectedArray = Array.from(selected);
-        onConfirm(selectedArray);
+        // Returns the list of prefixed keys which match our resultsHeaders
+        onConfirm(Array.from(selected));
     }
 
-    /**
-     * This handles the "Upgrade" button click *inside* the soft-gate modal.
-     */
     function handleUpgradeClick() {
         if (typeof LemonSqueezy !== 'undefined') {
             LemonSqueezy.Url.Open(overlayLink);
@@ -90,7 +83,9 @@
 <div class="selector-container">
     <h3>
         Select Columns to Export
-        
+        {#if isProUser}
+            <img src={proBadge} alt="Pro User Badge" class="pro-badge-image" />
+        {/if}
     </h3>
     <p>Select the columns you want to include in your download.</p>
 
@@ -116,8 +111,6 @@
             <button class="button-primary upgrade-button" onclick={handleUpgradeClick}>
                 Upgrade to Pro
             </button>
-        {:else}
-            <img src={proBadge} alt="Pro User Badge" class="pro-badge-image" />
         {/if}
     </div>
 
@@ -125,11 +118,12 @@
         <div class="column-list">
             <h4 title={fileA}>{fileA}</h4>
             {#each allColumnsA as column}
+                {@const compositeKey = `${fileA}_${column}`}
                 <label>
                     <input 
                         type="checkbox" 
-                        checked={selected.has(column)}
-                        onchange={(e) => handleCheckboxClick(e, column)}
+                        checked={selected.has(compositeKey)}
+                        onchange={(e) => handleCheckboxClick(e, compositeKey)}
                     />
                     {column}
                 </label>
@@ -139,11 +133,12 @@
         <div class="column-list">
             <h4 title={fileB}>{fileB}</h4>
             {#each allColumnsB as column}
+                {@const compositeKey = `${fileB}_${column}`}
                 <label>
                     <input 
                         type="checkbox" 
-                        checked={selected.has(column)}
-                        onchange={(e) => handleCheckboxClick(e, column)}
+                        checked={selected.has(compositeKey)}
+                        onchange={(e) => handleCheckboxClick(e, compositeKey)}
                     />
                     {column}
                 </label>
@@ -174,9 +169,7 @@
             tabindex="-1"
         >
             <h3>Column Selection is a Pro Feature</h3>
-            <p>
-                To select specific columns for your download, please upgrade to <strong>Pro</strong>.
-            </p>
+            <p>To select specific columns for your download, please upgrade to <strong>Pro</strong>.</p>
             
             <div class="soft-gate-actions">
                 <button class="button-secondary" onclick={() => showUpgradeModal = false}>
@@ -190,57 +183,38 @@
     </div>
 {/if}
 
-
 <style>
-    /* --- Main Container --- */
+    /* (Keep your existing styles exactly as they were) */
     .selector-container {
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        width: 600px; /* Set a specific width for desktop */
-        max-width: 100%; /* Ensure it can shrink */
+        width: 600px;
+        max-width: 100%;
     }
     
-    h3, p {
-        margin: 0;
-        text-align: center;
-    }
-    h3 {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
-    }
+    h3, p { margin: 0; text-align: center; }
+    h3 { display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+    
     .pro-badge-image {
         display: inline-block;
         height: 28px;
         vertical-align: middle;
     }
 
-    /* --- Quick Actions (Desktop) --- */
-    .quick-actions {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
+    .quick-actions { display: flex; align-items: center; gap: 0.75rem; }
 
-    /* This is the magic line for desktop: 
-    it targets the Pro button OR the Pro badge 
-    and pushes it to the far right. */
     .quick-actions > .upgrade-button,
-    .quick-actions > .pro-badge-image {
+    .quick-actions :global(.pro-badge-image) {
         margin-left: auto;
     }
 
-    /* --- Quick Actions (Mobile) --- */
-      
-    
-    /* --- Column Lists --- */
     .column-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 1rem;
     }
+
     .column-list {
         display: flex;
         flex-direction: column;
@@ -251,27 +225,27 @@
         padding: 0.75rem;
         border-radius: 6px;
     }
+
     .column-list h4 {
         margin: 0;
-        padding-bottom: 2rem; /* Space below */
-        padding-top: 0.25rem; /* Space above */
+        padding-bottom: 1rem;
+        padding-top: 0.25rem;
         border-bottom: 1px solid #ccc;
         font-size: 0.9rem;
-        line-height: 1.4; /* Give text vertical breathing room */
-
-        /* Truncate long filenames */
+        line-height: 1.4;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
     .column-list label {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         font-size: 0.9rem;
+        cursor: pointer;
     }
 
-    /* --- Final Actions (Cancel/Confirm) --- */
     .final-actions {
         display: flex;
         justify-content: flex-end;
@@ -279,7 +253,6 @@
         margin-top: 1rem;
     }
 
-    /* --- Base Button Styles --- */
     .button-primary, .button-secondary {
         font-size: 0.9rem;
         font-weight: 600;
@@ -287,38 +260,25 @@
         padding: 0.5rem 1rem;
         border-radius: 6px;
         cursor: pointer;
-        transition: background-color 0.2s ease, opacity 0.2s ease;
     }
-    .button-primary {
-        background-color: #3498db;
-        color: white;
-    }
-    .button-primary:hover {
-        background-color: #2980b9;
-    }
-    .button-primary:disabled,
-    .button-secondary:disabled {
+
+    .button-primary { background-color: #3498db; color: white; }
+    .button-primary:hover { background-color: #2980b9; }
+
+    .button-primary:disabled, .button-secondary:disabled {
         background-color: #ecf0f1;
         color: #34495e;
         border: 1px solid #bdc3c7;
         opacity: 0.6;
         cursor: not-allowed;
     }
-    .button-primary:disabled:hover,
-    .button-secondary:disabled:hover {
-        background-color: #ecf0f1;
-    }
+
     .button-secondary {
         background-color: #ecf0f1;
         color: #34495e;
         border: 1px solid #bdc3c7;
     }
-    .button-secondary:hover {
-        background-color: #e2e6e8;
-    }
-    
-    
-    /* --- NEW SOFT GATE MODAL --- */
+
     .soft-gate-backdrop {
         position: fixed;
         top: 0;
@@ -331,6 +291,7 @@
         align-items: center;
         z-index: 102; 
     }
+
     .soft-gate-modal {
         background: #fff;
         border-radius: 8px;
@@ -343,13 +304,7 @@
         gap: 1rem;
         z-index: 103;
     }
-    .soft-gate-modal h3 {
-        font-size: 1.25rem;
-    }
-    .soft-gate-modal p {
-        font-size: 0.95rem;
-        line-height: 1.5;
-    }
+
     .soft-gate-actions {
         display: flex;
         justify-content: flex-end;
@@ -357,31 +312,11 @@
         margin-top: 1rem;
     }
 
-    
     @media (max-width: 650px) {
-        /* This stacks the "File A" and "File B" lists */
-        .column-grid {
-            grid-template-columns: 1fr;
-        }
-
-        /* This stacks the bottom "Cancel" and "Confirm" buttons */
-        .final-actions {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0.5rem;
-        }
-
-        .quick-actions {
-            flex-direction: column; /* Stack all items */
-            align-items: stretch;  /* Make all items full-width */
-            gap: 0.5rem;
-        }
-
-        /* We reset the desktop margin */
+        .column-grid { grid-template-columns: 1fr; }
+        .final-actions { flex-direction: column; align-items: stretch; }
+        .quick-actions { flex-direction: column; align-items: stretch; }
         .quick-actions > .upgrade-button,
-        .quick-actions > .pro-badge-image {
-            margin-left: 0;
-        }
+        .quick-actions :global(.pro-badge-image) {margin-left: auto; }
     }
-
 </style>

@@ -36,6 +36,7 @@
 	let activeTab = $state('matches');
 	let resultsHeaders = $state([]);
 	let hasResults = $state(false);
+    let isProcessing = $state(false);
 
 	// --- Paywall State ---
 	
@@ -186,7 +187,7 @@
     /**
 	 * This is our main "VLOOKUP" function.
 	 */
-	async function runComparison() {
+     async function runComparison() {
 		// --- PAYWALL CHECK ---
         if ((dataA.length > FREE_TIER_LIMIT || dataB.length > FREE_TIER_LIMIT) && isProUser === false) {
             console.warn(`Paywall triggered. Popping upgrade modal.`);
@@ -195,16 +196,24 @@
         }
 		// --- END PAYWALL CHECK ---
 
-		console.log("--- Running Comparison ---");
+		//console.log("--- Running Comparison ---");
 
 		if (!selectedKeyA || !selectedKeyB) {
 			console.error("Please select match keys for both files.");
 			return;
 		}
 
-		console.log(`Matching File A on key "${selectedKeyA}" with File B on key "${selectedKeyB}"`);
+		// --- 2. START PROCESSING ---
+		// resultsHeaders needs to be reset to handle the new dual-column naming
+		resultsHeaders = [];
+		hasResults = false;
 
-		// Create a fast lookup map from File B
+		// Small delay to allow the UI to show a "Processing" state if you add one
+		await tick();
+
+		//console.log(`Matching File A on key "${selectedKeyA}" with File B on key "${selectedKeyB}"`);
+
+		// Create fast lookup maps
 		const lookupMapB = new Map();
 		for (const row of dataB) {
 			const lookupValue = row[selectedKeyB];
@@ -212,8 +221,8 @@
 				lookupMapB.set(String(lookupValue), row);
 			}
 		}
-		console.log("Created lookup map from File B:", lookupMapB);
-
+		//console.log("Created lookup map from File B:", lookupMapB);
+		
 		// Iterate through File A and perform the lookup
 		let newMatches = [];
 		let newMismatchesA = [];
@@ -221,9 +230,13 @@
 		for (const rowA of dataA) {
 			const lookupValue = String(rowA[selectedKeyA]);
 			const matchInB = lookupMapB.get(lookupValue);
-
 			if (matchInB) {
-				const mergedRow = { ...rowA, ...matchInB };
+				// Prefix keys to prevent File B from overwriting File A
+                // This also gives the Column Selector the unique keys it needs
+				let mergedRow = {};
+                Object.keys(rowA).forEach(key => mergedRow[`${filenameA}_${key}`] = rowA[key]);
+                Object.keys(matchInB).forEach(key => mergedRow[`${filenameB}_${key}`] = matchInB[key]);
+				
 				newMatches.push(mergedRow);
 			} else {
 				newMismatchesA.push(rowA);
@@ -244,7 +257,7 @@
 			}
 		}
 
-		// --- Update State with Results ---
+		// Update State
 		matches = newMatches;
 		mismatchesA = newMismatchesA;
 		mismatchesB = newMismatchesB;
@@ -261,14 +274,16 @@
 		hasResults = true;
 		activeTab = 'matches';
 
-		// Auto-scroll to results
+		// Auto-scroll to results at top of viewport
 		await tick();
-		resultsHeading.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-		console.log("--- Comparison Complete. Results are now in state. ---");
-		console.log("Matches:", matches);
-		console.log("Mismatches A:", mismatchesA);
-		console.log("Mismatches B:", mismatchesB);
+		if (resultsHeading) {
+            resultsHeading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+		
+		//console.log("--- Comparison Complete. Results are now in state. ---");
+		//console.log("Matches:", matches);
+		//console.log("Mismatches A:", mismatchesA);
+		//console.log("Mismatches B:", mismatchesB)
 	}
 
 	/**
@@ -329,9 +344,10 @@
 
         // 1. Filter the data to include ONLY the selected columns
         const filteredData = dataToExport.map(row => {
-            let newRow = {};
-            selectedColumns.forEach(col => {
-                newRow[col] = row[col];
+            selectedColumnKeys.forEach(compositeKey => {
+                // compositeKey is "filename-columnName"
+                // We need to map the internal data row back to these keys
+                newRow[compositeKey] = row[compositeKey];
             });
             return newRow;
         });
@@ -852,13 +868,13 @@
             grid-template-columns: 1fr;
         }
     }
-    /* --- Results Section Styles --- */
+    /* --- Results Section Layout --- */
     .results-section {
         margin-top: 2rem;
         background: #fff;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        overflow: hidden; /* This is key for the table container */
+        overflow: hidden;
     }
 
     .results-section h2 {
@@ -894,40 +910,52 @@
         border-bottom-color: #3498db;
     }
 
+    /* --- Table Container (Crucial for Horizontal Scroll) --- */
     .table-container {
         width: 100%;
-        max-height: 500px; /* Make the table scrollable */
-        overflow: auto; /* Adds scrollbars only if needed */
+        max-height: 600px;
+        overflow-x: auto; /* Enables horizontal scrolling for side-by-side columns */
+        overflow-y: auto; /* Enables vertical scrolling for long lists */
+        border: 1px solid #eee;
+        background-color: #fff;
     }
 
+    /* --- Data Table Styling --- */
     .data-table {
         width: 100%;
         border-collapse: collapse;
+        font-size: 0.9rem;
     }
 
+    /* Base style for all cells */
     .data-table th,
     .data-table td {
-        padding: 0.75rem 1rem;
+        padding: 0.85rem 1.25rem;
         text-align: left;
         border-bottom: 1px solid #f0f0f0;
-        white-space: nowrap; /* Prevents text from wrapping */
+        white-space: nowrap; /* Keeps data on one line for easy comparison */
     }
 
+    /* Header specific: Sticky and High Visibility */
     .data-table th {
-        background-color: #fcfcfc;
+        background-color: #f8f9fa;
+        color: #2c3e50;
         font-weight: 600;
-        position: sticky; /* Makes headers stick on scroll */
+        border-bottom: 2px solid #3498db; /* Visual accent for results */
+        position: sticky;
         top: 0;
+        z-index: 10;
+    }
+
+    /* Row interaction */
+    .data-table tr:hover {
+        background-color: #f9fbfd; /* Subtle highlight for row tracking */
     }
 
     .data-table tr:last-child td {
         border-bottom: none;
     }
-
-    .data-table tr:hover {
-        background-color: #f9f9f9;
-    }
-       
+        
 
    /* Add this for the logo */
     .logo {
